@@ -27,14 +27,23 @@ function finishedPosition() {
 
 function draw(e) {
     if (!drawing) return
+    const position = getMousePos(canvas, e)
     ctx.lineWidth = 10
     ctx.lineCap = "round"
 
-    ctx.lineTo(e.clientX, e.clientY)
+    ctx.lineTo(position.x, position.y)
     ctx.stroke()
     ctx.beginPath()
-    ctx.moveTo(e.clientX, e.clientY)
+    ctx.moveTo(position.x, position.y)
 
+}
+
+function getMousePos(canvas, evt) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: evt.clientX - rect.left,
+      y: evt.clientY - rect.top
+    };
 }
 
 canvas.addEventListener("mousedown", startPosition)
