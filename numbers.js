@@ -49,3 +49,11 @@ function getMousePos(canvas, evt) {
 canvas.addEventListener("mousedown", startPosition)
 canvas.addEventListener("mouseup", finishedPosition)
 canvas.addEventListener("mousemove", draw)
+
+const clearBtn = document.getElementById('clearBtn')
+const predictBtn = document.getElementById('predictBtn')
+clearBtn.addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height))
+predictBtn.addEventListener('click', () => {
+    const imageData = canvas.toDataURL()
+    console.log(imageData)
+})
