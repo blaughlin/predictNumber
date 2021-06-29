@@ -1,4 +1,3 @@
-
 window.addEventListener("load", () => {
     canvas.height = window.innerHeight / 2
     canvas.width = window.innerWidth / 2
@@ -14,6 +13,7 @@ window.addEventListener("resize", () => {
 const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext("2d")
 let drawing = false
+let model
 
 function startPosition(e) {
     drawing = true
@@ -30,7 +30,7 @@ function draw(e) {
     const position = getMousePos(canvas, e)
     ctx.lineWidth = 10
     ctx.lineCap = "round"
-
+    ctx.strokeStyle = "white";
     ctx.lineTo(position.x, position.y)
     ctx.stroke()
     ctx.beginPath()
@@ -46,6 +46,23 @@ function getMousePos(canvas, evt) {
     };
 }
 
+async function loadModel() {
+    model = undefined
+    model = await tf.loadLayersModel("models/model.json")
+}
+
+loadModel()
+
+function preprocessImage(image){
+    let tensor = tf.browser.fromPixels(image)
+        .resizeNearestNeighbor([28,28])
+        .mean(2)
+        .expandDims(2)
+        .expandDims()
+        .toFloat()
+    return tensor.div(255.0)
+}
+
 canvas.addEventListener("mousedown", startPosition)
 canvas.addEventListener("mouseup", finishedPosition)
 canvas.addEventListener("mousemove", draw)
@@ -53,7 +70,15 @@ canvas.addEventListener("mousemove", draw)
 const clearBtn = document.getElementById('clearBtn')
 const predictBtn = document.getElementById('predictBtn')
 clearBtn.addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height))
-predictBtn.addEventListener('click', () => {
-    const imageData = canvas.toDataURL()
-    console.log(imageData)
+predictBtn.addEventListener('click', async () => {
+    // const imageData = canvas.toDataURL()
+    
+    let tensor = preprocessImage(canvas)
+
+    let predictions = await model.predict(tensor).data();
+
+    let results = Array.from(predictions)
+
+    index = results.indexOf(Math.max(...results))
+    console.log(`Prediction is ${index}`)
 })
