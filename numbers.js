@@ -1,19 +1,24 @@
-window.addEventListener("load", () => {
-    canvas.height = window.innerHeight / 2
-    canvas.width = window.innerWidth / 2
-})
-
-window.addEventListener("resize", () => {
-    canvas.height = window.innerHeight / 2
-    canvas.width = window.innerWidth / 2
-
-}
-)
-
 const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext("2d")
 let drawing = false
 let model
+let prediction = document.getElementById("prediction")
+
+
+// window.addEventListener("load", () => {
+//     canvas.height = window.innerHeight / 2
+//     canvas.width = window.innerWidth / 4
+// })
+
+
+
+// window.addEventListener("resize", () => {
+//     canvas.height = window.innerHeight / 2
+//     canvas.width = window.innerWidth / 4
+
+// }
+// )
+
 
 function startPosition(e) {
     drawing = true
@@ -28,7 +33,7 @@ function finishedPosition() {
 function draw(e) {
     if (!drawing) return
     const position = getMousePos(canvas, e)
-    ctx.lineWidth = 10
+    ctx.lineWidth = 20
     ctx.lineCap = "round"
     ctx.strokeStyle = "white";
     ctx.lineTo(position.x, position.y)
@@ -69,16 +74,18 @@ canvas.addEventListener("mousemove", draw)
 
 const clearBtn = document.getElementById('clearBtn')
 const predictBtn = document.getElementById('predictBtn')
-clearBtn.addEventListener('click', () => ctx.clearRect(0, 0, canvas.width, canvas.height))
+const openCVBtn = document.getElementById('openCVBtn')
+
+clearBtn.addEventListener('click', () => {
+    prediction.innerHTML = ""
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+})
 predictBtn.addEventListener('click', async () => {
-    // const imageData = canvas.toDataURL()
-    
     let tensor = preprocessImage(canvas)
-
     let predictions = await model.predict(tensor).data();
-
     let results = Array.from(predictions)
-
     index = results.indexOf(Math.max(...results))
     console.log(`Prediction is ${index}`)
+    prediction.innerHTML = index
 })
+
